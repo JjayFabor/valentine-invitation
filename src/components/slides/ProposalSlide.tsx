@@ -7,6 +7,7 @@ import { useSmartEvasion } from "../../hooks/useSmartEvasion";
 export const ProposalSlide = () => {
     const noBtnRef = useRef<HTMLButtonElement>(null);
     const [accepted, setAccepted] = useState(false);
+    const [noBtnScale, setNoBtnScale] = useState(1);
 
     // Evasion logic
     const { position, evade } = useSmartEvasion(noBtnRef, !accepted);
@@ -55,40 +56,50 @@ export const ProposalSlide = () => {
                             YES!
                         </motion.button>
 
-                        <motion.button
-                            ref={noBtnRef}
-                            animate={{ x: position.x, y: position.y }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 400,
-                                damping: 20
-                            }}
-                            className="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full shadow-lg text-xl absolute"
-                            style={{
-                                // Start them side by side but absolute positioning might need tweaking relative to container
-                                // Let's rely on flex layout initially but position absolute inside the relative container allows movement
-                                // Actually, standard position is better. Let's make the container relative.
-                                position: 'absolute',
-                                right: '20%' // Initial position
-                            }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                toast.error("Nice try! 😉 You have to say YES!", {
-                                    style: {
-                                        background: 'rgba(255, 255, 255, 0.1)',
-                                        backdropFilter: 'blur(10px)',
-                                        color: 'white',
-                                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                        {noBtnScale > 0 && (
+                            <motion.button
+                                ref={noBtnRef}
+                                initial={{ scale: 1 }}
+                                animate={{
+                                    x: position.x,
+                                    y: position.y,
+                                    scale: noBtnScale
+                                }}
+                                transition={{
+                                    default: { type: "spring", stiffness: 400, damping: 20 },
+                                    scale: { duration: 0.2, type: "tween", ease: "easeInOut" }
+                                }}
+                                className="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full shadow-lg text-xl absolute"
+                                style={{
+                                    position: 'absolute',
+                                    right: '20%' // Initial position
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setNoBtnScale(prev => Math.max(0, prev - 0.2));
+
+                                    if (noBtnScale > 0.2) {
+                                        toast.error(
+                                            noBtnScale <= 0.4 ? "Almost gone! 👻" : "Nice try! 😉 You have to say YES!",
+                                            {
+                                                style: {
+                                                    background: 'rgba(255, 255, 255, 0.1)',
+                                                    backdropFilter: 'blur(10px)',
+                                                    color: 'white',
+                                                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                                                }
+                                            }
+                                        );
                                     }
-                                });
-                            }}
-                            onTouchStart={() => {
-                                // On mobile, "hover" doesn't exist. We dodge when they try to tap.
-                                evade();
-                            }}
-                        >
-                            No
-                        </motion.button>
+                                }}
+                                onTouchStart={() => {
+                                    // On mobile, "hover" doesn't exist. We dodge when they try to tap.
+                                    evade();
+                                }}
+                            >
+                                No
+                            </motion.button>
+                        )}
                         <Toaster position="top-center" />
                     </div>
                 </>
