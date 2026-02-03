@@ -82,7 +82,7 @@ export const ProposalSlide = () => {
                                     }
                                 });
                             }}
-                            onTouchStart={(e) => {
+                            onTouchStart={() => {
                                 // On mobile, "hover" doesn't exist. We dodge when they try to tap.
                                 evade();
                             }}
