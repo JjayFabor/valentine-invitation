@@ -9,7 +9,7 @@ import { sendValentineEmail, getEmailConfig } from "../../utils/emailService";
 export const ProposalSlide = () => {
     const [accepted, setAccepted] = useState(false);
     const [sending, setSending] = useState(false);
-    const [suggestions, setSuggestions] = useState("");
+    const suggestions = "";
     const [emailSent, setEmailSent] = useState(false);
 
     const handleYes = async () => {
