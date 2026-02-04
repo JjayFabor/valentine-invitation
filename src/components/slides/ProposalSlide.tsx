@@ -1,23 +1,20 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { toast, Toaster } from "sonner";
-import { useSmartEvasion } from "../../hooks/useSmartEvasion";
+import { Toaster } from "sonner";
+import { ProposalScene } from "../scene/ProposalScene";
+import { DatePlanSlide } from "./DatePlanSlide";
 
 export const ProposalSlide = () => {
-    const noBtnRef = useRef<HTMLButtonElement>(null);
     const [accepted, setAccepted] = useState(false);
-    const [noBtnScale, setNoBtnScale] = useState(1);
-
-    // Evasion logic
-    const { position, evade } = useSmartEvasion(noBtnRef, !accepted);
+    const [showPlan, setShowPlan] = useState(false);
 
     const handleYes = () => {
         setAccepted(true);
         // Fire confetti
-        const duration = 15 * 1000;
+        const duration = 5000;
         const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
 
         const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
@@ -32,87 +29,72 @@ export const ProposalSlide = () => {
             confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
             confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
         }, 250);
+
+        // Show plan after a delay
+        setTimeout(() => {
+            setShowPlan(true);
+        }, 3000);
     };
 
+    if (showPlan) {
+        return <DatePlanSlide />;
+    }
+
     return (
-        <div className="flex flex-col items-center justify-center h-full p-6 space-y-12 relative z-50">
-            {!accepted ? (
-                <>
-                    <h1 className="text-4xl font-black text-center leading-tight drop-shadow-xl">
-                        Will you be my<br />
-                        <span className="text-pink-500 text-6xl">Valentine?</span>
-                    </h1>
+        <div className="w-full h-full relative overflow-hidden">
+            <ProposalScene />
 
-                    <div className="flex gap-4 items-center justify-center w-full relative h-[100px]">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-full shadow-lg text-xl z-20 transition-colors"
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevent slide navigation
-                                handleYes();
-                            }}
+            <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 space-y-12 pointer-events-none">
+                {!accepted ? (
+                    <>
+                        <motion.div
+                            initial={{ y: -50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="text-center space-y-4"
                         >
-                            YES!
-                        </motion.button>
+                            <h1 className="text-4xl md:text-6xl font-black text-center leading-tight drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] text-white">
+                                Will you be my<br />
+                                <span className="text-pink-500 text-6xl md:text-8xl filter drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">Valentine?</span>
+                            </h1>
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                                className="text-sm md:text-base text-gray-300 italic"
+                            >
+                                (Psst... there's no "No" button. You have no choice but to say yes! 😉)
+                            </motion.p>
+                        </motion.div>
 
-                        {noBtnScale > 0 && (
+                        <div className="flex gap-6 items-center justify-center w-full relative h-[100px] pointer-events-auto">
                             <motion.button
-                                ref={noBtnRef}
-                                initial={{ scale: 1 }}
-                                animate={{
-                                    x: position.x,
-                                    y: position.y,
-                                    scale: noBtnScale
-                                }}
-                                transition={{
-                                    default: { type: "spring", stiffness: 400, damping: 20 },
-                                    scale: { duration: 0.2, type: "tween", ease: "easeInOut" }
-                                }}
-                                className="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full shadow-lg text-xl absolute"
-                                style={{
-                                    position: 'absolute',
-                                    right: '20%' // Initial position
-                                }}
+                                whileHover={{ scale: 1.1, boxShadow: "0 0 25px rgba(236, 72, 153, 0.6)" }}
+                                whileTap={{ scale: 0.95 }}
+                                className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-4 px-10 rounded-full shadow-lg text-2xl z-20 transition-all border border-pink-400/30 backdrop-blur-md"
                                 onClick={(e) => {
-                                    e.stopPropagation();
-                                    setNoBtnScale(prev => Math.max(0, prev - 0.2));
-
-                                    if (noBtnScale > 0.2) {
-                                        toast.error(
-                                            noBtnScale <= 0.4 ? "Almost gone! 👻" : "Nice try! 😉 You have to say YES!",
-                                            {
-                                                style: {
-                                                    background: 'rgba(255, 255, 255, 0.1)',
-                                                    backdropFilter: 'blur(10px)',
-                                                    color: 'white',
-                                                    border: '1px solid rgba(255, 255, 255, 0.2)'
-                                                }
-                                            }
-                                        );
-                                    }
-                                }}
-                                onTouchStart={() => {
-                                    // On mobile, "hover" doesn't exist. We dodge when they try to tap.
-                                    evade();
+                                    e.stopPropagation(); // Prevent slide navigation
+                                    handleYes();
                                 }}
                             >
-                                No
+                                YES! 💕
                             </motion.button>
-                        )}
-                        <Toaster position="top-center" />
-                    </div>
-                </>
-            ) : (
-                <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-center space-y-4"
-                >
-                    <h2 className="text-6xl">💖💖💖</h2>
-                    <h3 className="text-3xl font-bold">See you on the 14th!</h3>
-                </motion.div>
-            )}
+                        </div>
+                    </>
+                ) : (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-center space-y-6"
+                    >
+                        <h2 className="text-8xl animate-bounce">💖</h2>
+                        <h3 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 drop-shadow-lg">
+                            YAY! I knew it!
+                        </h3>
+                        <p className="text-xl text-white/80">Loading our date plan...</p>
+                    </motion.div>
+                )}
+            </div>
+            <Toaster position="top-center" />
         </div>
     );
 };

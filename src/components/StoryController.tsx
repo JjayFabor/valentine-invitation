@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ProgressBar } from "./common/ProgressBar";
-import { GlassCard } from "./common/GlassCard";
 
 // Import slides (placeholders for now) (We will create these next)
 import { IntroSlide } from "./slides/IntroSlide";
@@ -79,14 +77,13 @@ export const StoryController = () => {
 
     return (
         <div
-            className="w-full h-full flex justify-center items-center relative"
+            className="w-full h-full flex flex-col relative overflow-hidden bg-black/20 text-white"
             onClick={handleTap}
-        // Add touch handlers if needed, though onClick covers most mobile taps too. 
-        // React's onClick handles touch taps reasonably well.
         >
-            <GlassCard className="relative">
-                <ProgressBar totalSlides={SLIDES.length} currentSlide={currentIndex} />
+            {/* Subtle gradient overlay for depth over the whole screen */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none z-0" />
 
+            <div className="relative z-10 w-full h-full flex flex-col pt-safe-top pb-safe-bottom">
                 <div className="flex-1 w-full h-full relative overflow-hidden flex flex-col justify-center">
                     <AnimatePresence initial={false} custom={direction} mode="wait">
                         <motion.div
@@ -106,7 +103,7 @@ export const StoryController = () => {
                         </motion.div>
                     </AnimatePresence>
                 </div>
-            </GlassCard>
+            </div>
         </div>
     );
 };
