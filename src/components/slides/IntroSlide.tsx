@@ -1,7 +1,7 @@
-import { Canvas } from "@react-three/fiber";
-import { Text, Float, Stars, PerspectiveCamera, Sparkles } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Text, Float, Stars, PerspectiveCamera, Sparkles, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 const HeartShape = ({ color, ...props }: any) => {
@@ -18,8 +18,17 @@ const HeartShape = ({ color, ...props }: any) => {
         return heartShape;
     }, []);
 
+    const meshRef = useRef<THREE.Mesh>(null);
+
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.01;
+            meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime) * 0.1;
+        }
+    });
+
     return (
-        <mesh {...props}>
+        <mesh ref={meshRef} {...props}>
             <extrudeGeometry args={[shape, { depth: 0.3, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1 }]} />
             <meshStandardMaterial color={color || "#ff0080"} roughness={0.2} metalness={0.8} emissive={color || "#ff0080"} emissiveIntensity={0.3} />
         </mesh>
@@ -56,10 +65,105 @@ const FloatingHearts = () => {
     );
 };
 
-const IntroScene = () => {
+// Interactive 3D Text that responds to mouse
+const Interactive3DText = ({ isMobile }: { isMobile: boolean }) => {
+    const textRef = useRef<THREE.Mesh>(null);
+    const [hovered, setHovered] = useState(false);
+
+    useFrame((state) => {
+        if (textRef.current && !isMobile) {
+            // Smooth mouse follow effect
+            const targetX = (state.mouse.x * Math.PI) / 10;
+            const targetY = (state.mouse.y * Math.PI) / 10;
+
+            textRef.current.rotation.x += (targetY - textRef.current.rotation.x) * 0.05;
+            textRef.current.rotation.y += (targetX - textRef.current.rotation.y) * 0.05;
+        }
+
+        // Gentle floating animation
+        if (textRef.current) {
+            textRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+        }
+    });
+
+    return (
+        <Float speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
+            <group ref={textRef}>
+                <Text
+                    fontSize={isMobile ? 1.5 : 2.5}
+                    color="white"
+                    anchorX="center"
+                    anchorY="middle"
+                    position={[0, 0.5, 0]}
+                    maxWidth={isMobile ? 5 : 8}
+                    textAlign="center"
+                    font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
+                    onPointerOver={() => setHovered(true)}
+                    onPointerOut={() => setHovered(false)}
+                >
+                    2025 Wrapped
+                    <meshStandardMaterial
+                        color="#ffffff"
+                        emissive="#ff1493"
+                        emissiveIntensity={hovered ? 0.6 : 0.4}
+                        roughness={0.1}
+                        metalness={0.9}
+                    />
+                </Text>
+
+                <Text
+                    fontSize={isMobile ? 0.4 : 0.6}
+                    color="#ffb6c1"
+                    anchorX="center"
+                    anchorY="middle"
+                    position={[0, -1.2, 0]}
+                    maxWidth={isMobile ? 5 : 7}
+                    textAlign="center"
+                    font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
+                >
+                    It's been quite a year...
+                </Text>
+            </group>
+        </Float>
+    );
+};
+
+// Animated orbs in background
+const AnimatedOrb = ({ position, color, scale }: any) => {
+    const meshRef = useRef<THREE.Mesh>(null);
+
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.position.y += Math.sin(state.clock.elapsedTime + position[0]) * 0.002;
+            meshRef.current.rotation.x += 0.005;
+            meshRef.current.rotation.y += 0.003;
+        }
+    });
+
+    return (
+        <mesh ref={meshRef} position={position} scale={scale}>
+            <Sphere args={[1, 32, 32]}>
+                <MeshDistortMaterial
+                    color={color}
+                    attach="material"
+                    distort={0.4}
+                    speed={2}
+                    roughness={0.2}
+                    metalness={0.8}
+                    emissive={color}
+                    emissiveIntensity={0.3}
+                    transparent
+                    opacity={0.6}
+                />
+            </Sphere>
+        </mesh>
+    );
+};
+
+const IntroScene = ({ isMobile }: { isMobile: boolean }) => {
     return (
         <>
-            <PerspectiveCamera makeDefault position={[0, 0, 8]} />
+            <PerspectiveCamera makeDefault position={[0, 0, isMobile ? 12 : 8]} />
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={2} color="#ff1493" />
             <pointLight position={[-10, -10, -10]} intensity={1} color="#ff69b4" />
@@ -70,60 +174,44 @@ const IntroScene = () => {
 
             <FloatingHearts />
 
-            <Float speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
-                <Text
-                    fontSize={2}
-                    color="white"
-                    anchorX="center"
-                    anchorY="middle"
-                    position={[0, 0.5, 0]}
-                    maxWidth={7}
-                    textAlign="center"
-                    font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
-                >
-                    2025 Wrapped
-                    <meshStandardMaterial
-                        color="#ffffff"
-                        emissive="#ff1493"
-                        emissiveIntensity={0.4}
-                        roughness={0.1}
-                        metalness={0.9}
-                    />
-                </Text>
+            {/* Animated background orbs */}
+            <AnimatedOrb position={[-5, 3, -8]} color="#ff0080" scale={1.5} />
+            <AnimatedOrb position={[6, -2, -10]} color="#ff69b4" scale={1.2} />
+            <AnimatedOrb position={[0, 5, -12]} color="#ff1493" scale={1} />
 
-                <Text
-                    fontSize={0.5}
-                    color="#ffb6c1"
-                    anchorX="center"
-                    anchorY="middle"
-                    position={[0, -1.5, 0]}
-                    maxWidth={6}
-                    textAlign="center"
-                    font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
-                >
-                    It's been quite a year...
-                </Text>
-            </Float>
+            <Interactive3DText isMobile={isMobile} />
         </>
     );
 };
 
 export const IntroSlide = () => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile on mount
+    useState(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    });
+
     return (
         <div className="w-full h-full relative overflow-hidden bg-black">
             <div className="absolute inset-0 z-0">
                 <Canvas>
-                    <IntroScene />
+                    <IntroScene isMobile={isMobile} />
                 </Canvas>
             </div>
 
             {/* Overlay UI */}
-            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end items-center pb-20">
+            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end items-center pb-10 md:pb-20">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 2, duration: 1 }}
-                    className="text-sm text-gray-400 animate-pulse"
+                    className="text-xs md:text-sm text-gray-400 animate-pulse px-4 text-center"
                 >
                     Tap right to continue →
                 </motion.div>
