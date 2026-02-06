@@ -153,32 +153,32 @@ export const DatePlanContent = ({ compact = false }: DatePlanContentProps) => {
 
     return (
         <motion.div
-            className={`${compact ? 'space-y-4' : 'max-w-2xl mx-auto space-y-8 pb-10'}`}
+            className={`${compact ? 'space-y-4' : 'max-w-2xl mx-auto space-y-6 sm:space-y-8 pb-6 sm:pb-10'}`}
             variants={container}
             initial="hidden"
             animate="show"
         >
             <motion.div variants={item} className="text-center mb-4">
-                <h2 className={`${compact ? 'text-2xl' : 'text-4xl'} font-bold text-pink-400 mb-2`}>
+                <h2 className={`${compact ? 'text-lg sm:text-xl md:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'} font-bold text-pink-400 mb-2`}>
                     Our Virtual Date Plan 💖
                 </h2>
-                <p className={`${compact ? 'text-base' : 'text-xl'} text-gray-300 mb-3`}>
+                <p className={`${compact ? 'text-sm sm:text-base' : 'text-base sm:text-lg md:text-xl'} text-gray-300 mb-3`}>
                     February 14th, 2026
                 </p>
 
                 {/* Real-time clocks */}
-                <div className="flex items-center justify-center gap-4 mb-2">
-                    <div className="bg-pink-500/20 backdrop-blur-sm border border-pink-500/30 rounded-lg px-4 py-2">
-                        <div className="text-xs text-pink-300 mb-1">🇵🇭 Philippines</div>
-                        <div className="text-lg font-mono font-bold text-pink-400">{timePHT}</div>
+                <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2">
+                    <div className="bg-pink-500/20 backdrop-blur-sm border border-pink-500/30 rounded-lg px-2 py-1.5 sm:px-4 sm:py-2">
+                        <div className="text-[10px] sm:text-xs text-pink-300 mb-1">🇵🇭 Philippines</div>
+                        <div className="text-sm sm:text-base md:text-lg font-mono font-bold text-pink-400">{timePHT}</div>
                     </div>
-                    <div className="bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-lg px-4 py-2">
-                        <div className="text-xs text-purple-300 mb-1">🇦🇪 UAE</div>
-                        <div className="text-lg font-mono font-bold text-purple-400">{timeUAE}</div>
+                    <div className="bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-lg px-2 py-1.5 sm:px-4 sm:py-2">
+                        <div className="text-[10px] sm:text-xs text-purple-300 mb-1">🇦🇪 UAE</div>
+                        <div className="text-sm sm:text-base md:text-lg font-mono font-bold text-purple-400">{timeUAE}</div>
                     </div>
                 </div>
 
-                <p className={`${compact ? 'text-xs' : 'text-sm'} text-gray-400 italic`}>
+                <p className={`${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm'} text-gray-400 italic`}>
                     4 hours time difference
                 </p>
             </motion.div>
@@ -189,30 +189,30 @@ export const DatePlanContent = ({ compact = false }: DatePlanContentProps) => {
                         <span className={`absolute ${compact ? '-left-[26px] h-6 w-6' : '-left-[42px] md:-left-[50px] h-8 w-8 md:h-10 md:w-10'} top-1 rounded-full bg-pink-600 border-4 border-gray-900 flex items-center justify-center text-xs`}>
                             💌
                         </span>
-                        <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 hover:border-pink-500/50 transition-colors">
+                        <div className="bg-white/5 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-white/10 hover:border-pink-500/50 transition-colors">
                             <div className={`flex ${compact ? 'flex-col gap-1' : 'flex-row gap-3'} items-start mb-2`}>
                                 <div className="flex items-center gap-2">
-                                    <span className={`text-pink-400 font-mono ${compact ? 'text-xs' : 'text-sm'} tracking-wider font-bold`}>
+                                    <span className={`text-pink-400 font-mono ${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm'} tracking-wider font-bold`}>
                                         {step.timePHT}
                                     </span>
-                                    <span className={`text-pink-300/60 ${compact ? 'text-[10px]' : 'text-xs'} font-semibold`}>
+                                    <span className={`text-pink-300/60 ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'} font-semibold`}>
                                         PHT 🇵🇭
                                     </span>
                                 </div>
-                                <span className={`text-gray-400 ${compact ? 'text-[10px]' : 'text-xs'}`}>|</span>
+                                <span className={`text-gray-400 ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>|</span>
                                 <div className="flex items-center gap-2">
-                                    <span className={`text-purple-400 font-mono ${compact ? 'text-xs' : 'text-sm'} tracking-wider font-bold`}>
+                                    <span className={`text-purple-400 font-mono ${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm'} tracking-wider font-bold`}>
                                         {step.timeUAE}
                                     </span>
-                                    <span className={`text-purple-300/60 ${compact ? 'text-[10px]' : 'text-xs'} font-semibold`}>
+                                    <span className={`text-purple-300/60 ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'} font-semibold`}>
                                         GST 🇦🇪
                                     </span>
                                 </div>
                             </div>
-                            <h3 className={`${compact ? 'text-lg' : 'text-2xl'} font-bold text-white mt-1 mb-2`}>
+                            <h3 className={`${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'} font-bold text-white mt-1 mb-2`}>
                                 {step.title}
                             </h3>
-                            <p className={`${compact ? 'text-sm' : 'text-base'} text-gray-300 leading-relaxed`}>
+                            <p className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'} text-gray-300 leading-relaxed`}>
                                 {step.description}
                             </p>
                         </div>
@@ -221,8 +221,8 @@ export const DatePlanContent = ({ compact = false }: DatePlanContentProps) => {
             </div>
 
             {!compact && (
-                <motion.div variants={item} className="text-center pt-8">
-                    <p className="text-lg italic text-pink-200">
+                <motion.div variants={item} className="text-center pt-6 sm:pt-8">
+                    <p className="text-base sm:text-lg italic text-pink-200 px-2">
                         "Distance implies so little when someone means so much."
                     </p>
                 </motion.div>
@@ -242,7 +242,7 @@ export const DatePlanSlide = () => {
             </div>
 
             {/* Content Overlay */}
-            <div className="relative z-10 w-full h-full overflow-y-auto custom-scrollbar p-6">
+            <div className="relative z-10 w-full h-full overflow-y-auto custom-scrollbar p-4 sm:p-5 md:p-6">
                 <DatePlanContent />
             </div>
         </div>

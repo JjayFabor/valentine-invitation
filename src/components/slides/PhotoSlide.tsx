@@ -192,13 +192,13 @@ export const PhotoSlide = () => {
 
             {/* Overlay UI */}
             <div className="absolute inset-0 flex flex-col justify-between p-4 md:p-6 pointer-events-none z-10">
-                <div className="mt-6 md:mt-10 text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold text-pink-400 drop-shadow-lg font-serif">Memory Lane</h2>
+                <div className="mt-4 sm:mt-6 md:mt-10 text-center px-2">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-pink-400 drop-shadow-lg font-serif">Memory Lane</h2>
                 </div>
 
-                <div className="mb-16 md:mb-20 text-center">
-                    <div className="bg-black/50 backdrop-blur-md p-3 md:p-4 rounded-xl inline-block">
-                        <p className="text-white font-medium text-base md:text-lg italic">
+                <div className="mb-12 sm:mb-16 md:mb-20 text-center px-2">
+                    <div className="bg-black/50 backdrop-blur-md p-2.5 sm:p-3 md:p-4 rounded-xl inline-block">
+                        <p className="text-white font-medium text-sm sm:text-base md:text-lg italic">
                             "{PHOTO.caption}"
                         </p>
                     </div>
