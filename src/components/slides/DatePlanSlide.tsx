@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text, Float, Stars, Sparkles, OrbitControls } from "@react-three/drei";
+import { Float, Stars, Sparkles } from "@react-three/drei";
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -21,7 +21,7 @@ const HeartShape3D = ({ color, ...props }: any) => {
 
     const meshRef = useRef<THREE.Mesh>(null);
 
-    useFrame((state) => {
+    useFrame(() => {
         if (meshRef.current) {
             meshRef.current.rotation.y += 0.005;
         }
