@@ -1,10 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Image, Float, Sparkles } from "@react-three/drei";
+import { Float, Sparkles, useVideoTexture } from "@react-three/drei";
 import * as THREE from "three";
 
-const PHOTO = {
-    url: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop",
+const VIDEO_DATA = {
+    url: "/vid.MP4",
     caption: "Our Beautiful Memory 💕"
 };
 
@@ -60,6 +60,22 @@ const FloatingHearts = () => {
     );
 };
 
+const VideoFrame = () => {
+    const texture = useVideoTexture(VIDEO_DATA.url, {
+        unsuspend: 'canplay',
+        muted: true,
+        loop: true,
+        start: true,
+    });
+
+    return (
+        <mesh scale={[5, 3.5, 1]}>
+            <planeGeometry />
+            <meshBasicMaterial map={texture} toneMapped={false} />
+        </mesh>
+    );
+}
+
 const PhotoScene = () => {
     return (
         <>
@@ -71,12 +87,9 @@ const PhotoScene = () => {
 
             <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
                 <group position={[0, 0, 0]}>
-                    <Image
-                        url={PHOTO.url}
-                        scale={[5, 3.5]}
-                        transparent
-                        opacity={1}
-                    />
+                    <Suspense fallback={<mesh scale={[5, 3.5, 0.1]}><planeGeometry /><meshStandardMaterial color="#333" /></mesh>}>
+                        <VideoFrame />
+                    </Suspense>
                     {/* Frame border */}
                     <mesh position={[0, 0, -0.1]}>
                         <boxGeometry args={[5.2, 3.7, 0.1]} />
@@ -104,7 +117,7 @@ export const PhotoSlide = () => {
                 <div className="mb-20 text-center">
                     <div className="bg-black/50 backdrop-blur-md p-4 rounded-xl inline-block">
                         <p className="text-white font-medium text-lg italic">
-                            "{PHOTO.caption}"
+                            "{VIDEO_DATA.caption}"
                         </p>
                     </div>
                 </div>

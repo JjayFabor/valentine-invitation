@@ -57,27 +57,29 @@ const FloatingHearts = () => {
 };
 
 const IntroScene = () => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
     return (
         <>
-            <PerspectiveCamera makeDefault position={[0, 0, 8]} />
+            <PerspectiveCamera makeDefault position={[0, 0, isMobile ? 12 : 8]} />
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={2} color="#ff1493" />
             <pointLight position={[-10, -10, -10]} intensity={1} color="#ff69b4" />
             <pointLight position={[0, 10, 5]} intensity={1.5} color="#ffb6c1" />
 
-            <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={0.5} />
-            <Sparkles count={100} scale={15} size={3} speed={0.3} opacity={0.6} color="#fff" />
+            <Stars radius={100} depth={50} count={isMobile ? 1500 : 3000} factor={4} saturation={0} fade speed={0.5} />
+            <Sparkles count={isMobile ? 50 : 100} scale={15} size={3} speed={0.3} opacity={0.6} color="#fff" />
 
             <FloatingHearts />
 
             <Float speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
                 <Text
-                    fontSize={2}
+                    fontSize={isMobile ? 1.2 : 2}
                     color="white"
                     anchorX="center"
                     anchorY="middle"
                     position={[0, 0.5, 0]}
-                    maxWidth={7}
+                    maxWidth={isMobile ? 5 : 7}
                     textAlign="center"
                     font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
                 >
@@ -92,12 +94,12 @@ const IntroScene = () => {
                 </Text>
 
                 <Text
-                    fontSize={0.5}
+                    fontSize={isMobile ? 0.35 : 0.5}
                     color="#ffb6c1"
                     anchorX="center"
                     anchorY="middle"
-                    position={[0, -1.5, 0]}
-                    maxWidth={6}
+                    position={[0, -1.2, 0]}
+                    maxWidth={isMobile ? 4 : 6}
                     textAlign="center"
                     font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
                 >
@@ -109,6 +111,8 @@ const IntroScene = () => {
 };
 
 export const IntroSlide = () => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
     return (
         <div className="w-full h-full relative overflow-hidden bg-black">
             <div className="absolute inset-0 z-0">
@@ -125,7 +129,7 @@ export const IntroSlide = () => {
                     transition={{ delay: 2, duration: 1 }}
                     className="text-sm text-gray-400 animate-pulse"
                 >
-                    Tap right to continue →
+                    {isMobile ? "Swipe to continue →" : "Swipe or Click right to continue →"}
                 </motion.div>
             </div>
         </div>

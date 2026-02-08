@@ -34,30 +34,6 @@ export const StoryController = () => {
         }
     };
 
-    const handleTap = (e: React.MouseEvent | React.TouchEvent) => {
-        // Basic screen division logic: Left 20% = Back, Right 80% = Next
-        // We need to access the clientX. For simplicity, we use the target's bounding rect or window width if full screen.
-        // However, since we are inside a centered container on desktop, we should use the container's coordinates or just full screen logic?
-        // User requested "Story Interface", which implies the whole screen is the tap target usually. 
-        // But since desktop is centered, maybe the clicks should register on the card or the whole background?
-        // Let's attach the click handler to the main container.
-
-        // Using window width for simplicity in this version, as user might tap outside the card on mobile?
-        // Actually, "Story Interface" usually implies the content is the interactive part.
-        // Let's use the event coordinates.
-
-        const clientX = 'touches' in e
-            ? (e as React.TouchEvent).touches[0].clientX
-            : (e as React.MouseEvent).clientX;
-
-        const width = window.innerWidth;
-        if (clientX < width * 0.25) {
-            handleBack();
-        } else {
-            handleNext();
-        }
-    };
-
     const CurrentSlide = SLIDES[currentIndex];
 
     const variants = {
@@ -78,7 +54,6 @@ export const StoryController = () => {
     return (
         <div
             className="w-full h-full flex flex-col relative overflow-hidden bg-black/20 text-white"
-            onClick={handleTap}
         >
             {/* Subtle gradient overlay for depth over the whole screen */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none z-0" />
@@ -93,6 +68,18 @@ export const StoryController = () => {
                             initial="enter"
                             animate="center"
                             exit="exit"
+                            drag="x"
+                            dragConstraints={{ left: 0, right: 0 }}
+                            dragElastic={0.2}
+                            onDragEnd={(_, info) => {
+                                const swipe = info.offset.x;
+                                const threshold = 50;
+                                if (swipe < -threshold) {
+                                    handleNext();
+                                } else if (swipe > threshold) {
+                                    handleBack();
+                                }
+                            }}
                             transition={{
                                 x: { type: "spring", stiffness: 300, damping: 30 },
                                 opacity: { duration: 0.2 }
