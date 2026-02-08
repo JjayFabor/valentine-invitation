@@ -4,7 +4,6 @@ import {
     Float,
     Stars,
     Sparkles,
-    RoundedBox,
 } from "@react-three/drei";
 import { motion } from "framer-motion";
 import { useMemo, useRef, useState, useEffect } from "react";
@@ -97,31 +96,6 @@ const FloatingHearts = () => {
     );
 };
 
-// ——— Soft glowing orbs ———
-const GlowOrb = ({
-    position,
-    color,
-    scale,
-}: {
-    position: [number, number, number];
-    color: string;
-    scale: number;
-}) => {
-    const meshRef = useRef<THREE.Mesh>(null);
-    useFrame((state) => {
-        if (meshRef.current) {
-            meshRef.current.position.y += Math.sin(state.clock.elapsedTime + position[0]) * 0.002;
-            meshRef.current.rotation.y += 0.004;
-        }
-    });
-
-    return (
-        <mesh ref={meshRef} position={position} scale={scale}>
-            <sphereGeometry args={[1, 32, 32]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} transparent opacity={0.3} />
-        </mesh>
-    );
-};
 
 const IntroScene = ({ isMobile }: { isMobile: boolean }) => {
     return (
