@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Text, Float, Stars, Sparkles, RoundedBox } from "@react-three/drei";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Text, Float, Stars, Sparkles } from "@react-three/drei";
+import * as THREE from "three";
 
 const FONT_URL = "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff";
 const MOBILE_BREAKPOINT = 768;
@@ -33,13 +34,90 @@ const useTimeTogether = () => {
     return time;
 };
 
+// ——— Heart shape (extruded bezier) ———
+const HeartShape = ({ color, ...props }: { color?: string } & Record<string, unknown>) => {
+    const shape = useMemo(() => {
+        const x = 0, y = 0;
+        const heartShape = new THREE.Shape();
+        heartShape.moveTo(x + 0.5, y + 0.5);
+        heartShape.bezierCurveTo(x + 0.5, y + 0.5, x + 0.4, y, x, y);
+        heartShape.bezierCurveTo(x - 0.6, y, x - 0.6, y + 0.7, x - 0.6, y + 0.7);
+        heartShape.bezierCurveTo(x - 0.6, y + 1.1, x - 0.3, y + 1.54, x + 0.5, y + 1.9);
+        heartShape.bezierCurveTo(x + 1.2, y + 1.54, x + 1.6, y + 1.1, x + 1.6, y + 0.7);
+        heartShape.bezierCurveTo(x + 1.6, y + 0.7, x + 1.6, y, x + 1.0, y);
+        heartShape.bezierCurveTo(x + 0.7, y, x + 0.5, y + 0.5, x + 0.5, y + 0.5);
+        return heartShape;
+    }, []);
+
+    const meshRef = useRef<THREE.Mesh>(null);
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.008;
+            meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime) * 0.08;
+        }
+    });
+
+    return (
+        <mesh ref={meshRef} {...props}>
+            <extrudeGeometry
+                args={[
+                    shape,
+                    {
+                        depth: 0.2,
+                        bevelEnabled: true,
+                        bevelSegments: 2,
+                        steps: 2,
+                        bevelSize: 0.08,
+                        bevelThickness: 0.08,
+                    },
+                ]}
+            />
+            <meshStandardMaterial
+                color={color || "#ff0080"}
+                roughness={0.25}
+                metalness={0.7}
+                emissive={color || "#ff0080"}
+                emissiveIntensity={0.28}
+            />
+        </mesh>
+    );
+};
+
+const FloatingHearts = () => {
+    const hearts = useMemo(
+        () =>
+            new Array(15).fill(0).map(() => ({
+                position: [
+                    (Math.random() - 0.5) * 22,
+                    (Math.random() - 0.5) * 18,
+                    (Math.random() - 0.5) * 12 - 5,
+                ] as [number, number, number],
+                scale: Math.random() * 0.4 + 0.1,
+                color: Math.random() > 0.5 ? "#ff0080" : "#ff69b4",
+            })),
+        []
+    );
+
+    return (
+        <>
+            {hearts.map((data, i) => (
+                <Float
+                    key={i}
+                    speed={0.6 + Math.random() * 0.5}
+                    rotationIntensity={0.4}
+                    floatIntensity={0.7}
+                >
+                    <HeartShape position={data.position} scale={data.scale} color={data.color} />
+                </Float>
+            ))}
+        </>
+    );
+};
+
 const StatItem = ({ label, value, color, position, isMobile, emoji, isHero }: any) => {
     const [hovered, setHovered] = useState(false);
 
-    const size: [number, number, number] = isHero
-        ? (isMobile ? [5.5, 3.2, 0.2] : [8, 3, 0.2])
-        : (isMobile ? [3, 1.8, 0.2] : [3.5, 2.2, 0.2]);
-    const valueSize = isHero ? (isMobile ? 0.45 : 1.2) : (isMobile ? 0.7 : 1.2);
+    const valueSize = isHero ? (isMobile ? 0.45 : 1.2) : (isMobile ? 0.7 : 1.0);
     const labelSize = isMobile ? 0.18 : 0.25;
 
     return (
@@ -48,38 +126,17 @@ const StatItem = ({ label, value, color, position, isMobile, emoji, isHero }: an
                 onPointerOver={() => setHovered(true)}
                 onPointerOut={() => setHovered(false)}
             >
-                <RoundedBox args={size} radius={0.1} smoothness={4}>
-                    <meshStandardMaterial
-                        color="#111"
-                        transparent
-                        opacity={0.8}
-                        metalness={0.9}
-                        roughness={0.1}
-                        emissive={color}
-                        emissiveIntensity={hovered ? 0.2 : 0.05}
-                    />
-                </RoundedBox>
-
-                {/* Glassy Overlay */}
-                <RoundedBox args={[size[0] * 0.98, size[1] * 0.98, size[2] + 0.01]} radius={0.1} smoothness={4} position={[0, 0, 0.01]}>
-                    <meshStandardMaterial
-                        color={color}
-                        transparent
-                        opacity={0.1}
-                        metalness={1}
-                        roughness={0}
-                    />
-                </RoundedBox>
-
-                <group position={[0, 0, size[2] / 2 + 0.05]}>
+                <group position={[0, 0, 0]}>
                     {emoji && (
-                        <Text
-                            font={FONT_URL}
-                            fontSize={isHero ? 0.5 : 0.4}
-                            position={[0, isHero ? 0.8 : 0.6, 0]}
-                        >
-                            {emoji}
-                        </Text>
+                        <Float speed={3} rotationIntensity={1.5} floatIntensity={0.5}>
+                            <Text
+                                font={FONT_URL}
+                                fontSize={isHero ? 0.6 : 0.5}
+                                position={[0, isHero ? 0.9 : 0.7, 0]}
+                            >
+                                {emoji}
+                            </Text>
+                        </Float>
                     )}
 
                     <Text
@@ -88,8 +145,8 @@ const StatItem = ({ label, value, color, position, isMobile, emoji, isHero }: an
                         color="white"
                         anchorX="center"
                         anchorY="middle"
-                        position={[0, isHero ? 0.05 : 0.1, 0]}
-                        maxWidth={size[0] - 0.5}
+                        position={[0, isHero ? 0.1 : 0.1, 0]}
+                        maxWidth={isHero ? 8 : 4}
                         textAlign="center"
                         lineHeight={1.2}
                     >
@@ -97,19 +154,26 @@ const StatItem = ({ label, value, color, position, isMobile, emoji, isHero }: an
                         <meshStandardMaterial
                             color="white"
                             emissive={color}
-                            emissiveIntensity={hovered ? 0.5 : 0.2}
+                            emissiveIntensity={hovered ? 2.5 : 1.5}
                         />
                     </Text>
 
                     <Text
                         font={FONT_URL}
                         fontSize={labelSize}
-                        color="gray"
+                        color="#ffffff"
                         anchorX="center"
                         anchorY="middle"
-                        position={[0, isHero ? -0.8 : -0.6, 0]}
+                        position={[0, isHero ? -1.0 : -0.7, 0]}
                     >
                         {label}
+                        <meshStandardMaterial
+                            color="#ffffff"
+                            emissive={color}
+                            emissiveIntensity={hovered ? 0.8 : 0.4}
+                            transparent
+                            opacity={0.8}
+                        />
                     </Text>
                 </group>
             </group>
@@ -117,8 +181,25 @@ const StatItem = ({ label, value, color, position, isMobile, emoji, isHero }: an
     );
 };
 
-const StatsScene = ({ isMobile }: { isMobile: boolean }) => {
+
+const StatsScene = ({ isMobile, isSmallMobile }: { isMobile: boolean; isSmallMobile: boolean }) => {
     const time = useTimeTogether();
+    const groupRef = useRef<THREE.Group>(null);
+    const lightRef = useRef<THREE.PointLight>(null);
+    const { mouse } = useThree();
+
+    useFrame((state) => {
+        if (groupRef.current) {
+            // Mouse Parallax
+            groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, mouse.x * 0.5, 0.1);
+            groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, mouse.y * 0.5 + (isMobile ? -0.5 : 0), 0.1);
+        }
+        if (lightRef.current) {
+            // Dynamic pulsing light
+            lightRef.current.intensity = 1.5 + Math.sin(state.clock.elapsedTime * 2) * 0.5;
+            lightRef.current.position.x = Math.sin(state.clock.elapsedTime) * 5;
+        }
+    });
 
     // Format countdown string
     const countdownStr = isMobile
@@ -153,20 +234,22 @@ const StatsScene = ({ isMobile }: { isMobile: boolean }) => {
     return (
         <>
             <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} intensity={1.5} color="#ff0080" />
+            <pointLight ref={lightRef} position={[10, 10, 10]} intensity={1.5} color="#ff0080" />
             <pointLight position={[-10, -10, -10]} intensity={1} color="#00ffff" />
 
             <Stars radius={100} depth={50} count={isMobile ? 2000 : 5000} factor={4} saturation={0} fade speed={1} />
             <Sparkles count={isMobile ? 50 : 100} scale={15} size={3} speed={0.4} opacity={0.6} color="#ff0080" />
 
-            <group position={[0, isMobile ? -0.5 : 0, 0]}>
+            <FloatingHearts />
+
+            <group ref={groupRef}>
                 <Text
                     font={FONT_URL}
-                    fontSize={isMobile ? 1.5 : 2.5}
+                    fontSize={isSmallMobile ? 1.0 : isMobile ? 1.5 : 2.5}
                     color="white"
                     anchorX="center"
                     anchorY="middle"
-                    position={[0, isMobile ? 5 : 4.5, -3]}
+                    position={[0, isSmallMobile ? 5.5 : isMobile ? 5.8 : 5, -3]}
                 >
                     Our Journey
                     <meshStandardMaterial color="#ffffff" emissive="#ff0080" emissiveIntensity={0.5} />
@@ -180,7 +263,7 @@ const StatsScene = ({ isMobile }: { isMobile: boolean }) => {
     );
 };
 
-export const StatsSlide = () => {
+export const StatsSlide = (_props: any) => {
     const [isMobile, setIsMobile] = useState(false);
     const [isSmallMobile, setIsSmallMobile] = useState(false);
 
@@ -205,7 +288,7 @@ export const StatsSlide = () => {
                 dpr={typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1}
                 gl={{ antialias: true, alpha: false }}
             >
-                <StatsScene isMobile={isMobile} />
+                <StatsScene isMobile={isMobile} isSmallMobile={isSmallMobile} />
             </Canvas>
 
             <div className="absolute bottom-10 w-full text-center pointer-events-none px-4">

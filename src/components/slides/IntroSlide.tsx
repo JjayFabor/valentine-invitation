@@ -110,7 +110,7 @@ const IntroScene = ({ isMobile }: { isMobile: boolean }) => {
 
             <FloatingHearts />
 
-            <Float speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
+            <Float speed={3} rotationIntensity={0.5} floatIntensity={0.5}>
                 <Text
                     fontSize={isMobile ? 1.2 : 2}
                     color="white"
@@ -125,12 +125,14 @@ const IntroScene = ({ isMobile }: { isMobile: boolean }) => {
                     <meshStandardMaterial
                         color="#ffffff"
                         emissive="#ff1493"
-                        emissiveIntensity={0.4}
+                        emissiveIntensity={2.5}
                         roughness={0.1}
                         metalness={0.9}
                     />
                 </Text>
+            </Float>
 
+            <Float speed={2} rotationIntensity={0.2} floatIntensity={0.8}>
                 <Text
                     fontSize={isMobile ? 0.35 : 0.5}
                     color="#ffb6c1"
@@ -142,13 +144,20 @@ const IntroScene = ({ isMobile }: { isMobile: boolean }) => {
                     font={FONT_URL}
                 >
                     It's been quite a year...
+                    <meshStandardMaterial
+                        color="#ffb6c1"
+                        emissive="#ff69b4"
+                        emissiveIntensity={0.8}
+                        transparent
+                        opacity={0.9}
+                    />
                 </Text>
             </Float>
         </>
     );
 };
 
-export const IntroSlide = () => {
+export const IntroSlide = (_props: any) => {
     const [isMobile, setIsMobile] = useState(false);
     const [isSmallMobile, setIsSmallMobile] = useState(false);
 

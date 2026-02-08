@@ -1,7 +1,9 @@
 import { useMemo, Suspense, useState, useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Sparkles, useVideoTexture } from "@react-three/drei";
+import { Float, Sparkles, useVideoTexture, Text } from "@react-three/drei";
 import * as THREE from "three";
+
+const FONT_URL = "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff";
 
 const VIDEO_DATA = {
     url: "/vid.MP4",
@@ -91,28 +93,63 @@ const PhotoScene = ({ isMobile }: { isMobile: boolean }) => {
     return (
         <>
             <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} intensity={1} color="#ffcccc" />
+            <pointLight position={[10, 10, 10]} intensity={2} color="#ff0080" />
+            <pointLight position={[-10, -10, -10]} intensity={1} color="#00ffff" />
             <Sparkles count={isMobile ? 50 : 100} scale={12} size={2} speed={0.4} opacity={0.5} color="#fff" />
 
             <FloatingHearts />
 
+            {/* Title */}
             <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
-                <group position={[0, 0, 0]}>
+                <Text
+                    font={FONT_URL}
+                    fontSize={isMobile ? 0.8 : 1.2}
+                    color="#ff69b4"
+                    anchorX="center"
+                    anchorY="middle"
+                    position={[0, isMobile ? 4.5 : 4, -2]}
+                >
+                    Memory Lane
+                    <meshStandardMaterial color="#ff69b4" emissive="#ff0080" emissiveIntensity={2} />
+                </Text>
+            </Float>
+
+            {/* Video Content */}
+            <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.4}>
+                <group position={[0, isMobile ? 0.3 : 0, 0]}>
                     <Suspense fallback={<mesh scale={[isMobile ? 4 : 5, isMobile ? 2.8 : 3.5, 0.1]}><planeGeometry /><meshStandardMaterial color="#333" /></mesh>}>
                         <VideoFrame isMobile={isMobile} />
                     </Suspense>
-                    {/* Frame border */}
+                    {/* Frame border with glow */}
                     <mesh position={[0, 0, -0.1]}>
                         <boxGeometry args={[isMobile ? 4.2 : 5.2, isMobile ? 3 : 3.7, 0.1]} />
-                        <meshStandardMaterial color="#ffc0cb" metalness={0.8} roughness={0.2} />
+                        <meshStandardMaterial color="#ff0080" emissive="#ff0080" emissiveIntensity={0.5} metalness={0.8} roughness={0.2} />
                     </mesh>
                 </group>
+            </Float>
+
+            {/* Caption */}
+            <Float speed={2} rotationIntensity={0.3} floatIntensity={0.6}>
+                <Text
+                    font={FONT_URL}
+                    fontSize={isMobile ? 0.4 : 0.6}
+                    color="white"
+                    anchorX="center"
+                    anchorY="middle"
+                    position={[0, isMobile ? -3.5 : -3, 0]}
+                    maxWidth={isMobile ? 6 : 10}
+                    textAlign="center"
+                    fontStyle="italic"
+                >
+                    "{VIDEO_DATA.caption}"
+                    <meshStandardMaterial color="white" emissive="#ff69b4" emissiveIntensity={0.8} />
+                </Text>
             </Float>
         </>
     );
 };
 
-export const PhotoSlide = () => {
+export const PhotoSlide = (_props: any) => {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -126,23 +163,15 @@ export const PhotoSlide = () => {
 
     return (
         <div className="w-full h-full relative overflow-hidden bg-black">
-            <Canvas camera={{ position: [0, 0, isMobile ? 10 : 8], fov: 50 }}>
+            <Canvas camera={{ position: [0, 0, isMobile ? 12 : 10], fov: 50 }}>
                 <PhotoScene isMobile={isMobile} />
             </Canvas>
 
-            {/* Overlay UI */}
-            <div className="absolute inset-0 flex flex-col justify-between p-4 md:p-6 pointer-events-none z-10">
-                <div className="mt-4 sm:mt-6 md:mt-10 text-center px-2">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-pink-400 drop-shadow-lg font-serif">Memory Lane</h2>
-                </div>
-
-                <div className="mb-20 text-center">
-                    <div className="bg-black/50 backdrop-blur-md p-4 rounded-xl inline-block">
-                        <p className="text-white font-medium text-lg italic">
-                            "{VIDEO_DATA.caption}"
-                        </p>
-                    </div>
-                </div>
+            {/* Swipe prompt integration */}
+            <div className="absolute bottom-10 inset-0 flex flex-col justify-end items-center pointer-events-none z-20">
+                <p className="text-[10px] md:text-xs text-gray-500 font-mono opacity-60">
+                    (Memory captured with Love • Real-time Playback)
+                </p>
             </div>
         </div>
     );

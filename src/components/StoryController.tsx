@@ -19,6 +19,7 @@ const SLIDES = [
 export const StoryController = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0); // -1 for back, 1 for next
+    const [selectedMovie, setSelectedMovie] = useState<any>(null);
 
     const handleNext = () => {
         if (currentIndex < SLIDES.length - 1) {
@@ -86,7 +87,10 @@ export const StoryController = () => {
                             }}
                             className="w-full h-full absolute inset-0 flex flex-col"
                         >
-                            <CurrentSlide />
+                            <CurrentSlide
+                                selectedMovie={selectedMovie}
+                                setSelectedMovie={setSelectedMovie}
+                            />
                         </motion.div>
                     </AnimatePresence>
                 </div>

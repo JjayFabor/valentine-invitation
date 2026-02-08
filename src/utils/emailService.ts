@@ -5,6 +5,8 @@ export interface EmailData {
     girlfriendEmail: string;
     zoomLink: string;
     suggestions?: string;
+    movieTitle?: string;
+    movieEmoji?: string;
 }
 
 export const sendValentineEmail = async (data: EmailData): Promise<boolean> => {
@@ -28,6 +30,7 @@ export const sendValentineEmail = async (data: EmailData): Promise<boolean> => {
         const templateParams = {
             zoom_link: data.zoomLink,
             suggestions: data.suggestions || 'No suggestions - the plan looks perfect!',
+            selected_movie: data.movieTitle ? `${data.movieEmoji || '🎬'} ${data.movieTitle}` : 'None chosen yet',
         };
 
         // Send to your email

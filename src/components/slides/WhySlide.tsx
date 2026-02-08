@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text, Float, Stars, Sparkles, RoundedBox } from "@react-three/drei";
+import { Text, Float, Stars, Sparkles } from "@react-three/drei";
 import { motion } from "framer-motion";
 import * as THREE from "three";
 
@@ -10,25 +10,11 @@ const SMALL_MOBILE_BREAKPOINT = 480;
 
 const WhyYouTitle = ({ isMobile }: { isMobile: boolean }) => {
     const [hovered, setHovered] = useState(false);
-    const cardSize: [number, number, number] = isMobile ? [4.5, 2.5, 0.2] : [8, 4, 0.2];
     const fontSize = isMobile ? 1.5 : 3;
-
     return (
         <Float speed={2} rotationIntensity={0.1} floatIntensity={0.5}>
-            <group position={[0, 2, -5]}>
-                <RoundedBox args={cardSize} radius={0.08} smoothness={4}>
-                    <meshStandardMaterial
-                        color="#0d0510"
-                        transparent
-                        opacity={0.85}
-                        roughness={0.2}
-                        metalness={0.65}
-                        emissive="#ff69b4"
-                        emissiveIntensity={hovered ? 0.12 : 0.06}
-                    />
-                </RoundedBox>
+            <group position={[0, isMobile ? 3.5 : 3, -5]}>
                 <group
-                    position={[0, 0, cardSize[2] / 2 + 0.02]}
                     onPointerOver={() => setHovered(true)}
                     onPointerOut={() => setHovered(false)}
                 >
@@ -44,7 +30,7 @@ const WhyYouTitle = ({ isMobile }: { isMobile: boolean }) => {
                         <meshStandardMaterial
                             color="#ff69b4"
                             emissive="#ff0080"
-                            emissiveIntensity={hovered ? 0.6 : 0.4}
+                            emissiveIntensity={hovered ? 2.5 : 1.5}
                             roughness={0.1}
                             metalness={0.85}
                         />
@@ -130,7 +116,7 @@ const WhyScene = ({ isMobile }: { isMobile: boolean }) => {
     );
 };
 
-export const WhySlide = () => {
+export const WhySlide = (_props: any) => {
     const [isMobile, setIsMobile] = useState(false);
     const [isSmallMobile, setIsSmallMobile] = useState(false);
 
@@ -163,7 +149,7 @@ export const WhySlide = () => {
             {/* Content Overlay */}
             <div className="absolute inset-0 z-10 flex flex-col justify-center items-center p-6 md:p-8 pointer-events-none">
                 <motion.div
-                    className={`max-w-2xl text-center space-y-6 md:space-y-8 ${isMobile ? 'mt-32' : 'mt-20'}`}
+                    className={`max-w-2xl text-center space-y-6 md:space-y-8 ${isMobile ? 'mt-40' : 'mt-28'}`}
                     initial="hidden"
                     animate="visible"
                     variants={{ visible: { transition: { staggerChildren: 0.25 } } }}
@@ -176,7 +162,6 @@ export const WhySlide = () => {
                         className="text-lg md:text-2xl text-gray-200 font-light leading-relaxed px-2"
                     >
                         Because you make even the boring days feel like an adventure.
-                        <span className="text-gray-400 text-xs md:text-sm block mt-2">(And you let me pick the music in the car... usually.)</span>
                     </motion.p>
 
                     <motion.p

@@ -6,7 +6,7 @@ import { ProposalScene } from "../scene/ProposalScene";
 import { DatePlanContent } from "./DatePlanSlide";
 import { sendValentineEmail, getEmailConfig } from "../../utils/emailService";
 
-export const ProposalSlide = () => {
+export const ProposalSlide = ({ selectedMovie, setSelectedMovie }: { selectedMovie: any, setSelectedMovie: (movie: any) => void }) => {
     const [accepted, setAccepted] = useState(false);
     const [sending, setSending] = useState(false);
     const suggestions = "";
@@ -43,6 +43,8 @@ export const ProposalSlide = () => {
             girlfriendEmail: config.girlfriendEmail,
             zoomLink: config.zoomLink,
             suggestions: suggestions || "No suggestions - the plan looks perfect!",
+            movieTitle: selectedMovie?.title,
+            movieEmoji: selectedMovie?.emoji,
         });
 
         setSending(false);
@@ -130,7 +132,11 @@ export const ProposalSlide = () => {
 
                     {/* Right Side - Date Plan Preview */}
                     <div className="flex-1 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-3 sm:p-4 md:p-6 overflow-y-auto custom-scrollbar max-h-[600px] lg:max-h-full pointer-events-auto">
-                        <DatePlanContent compact />
+                        <DatePlanContent
+                            compact
+                            selectedMovie={selectedMovie}
+                            setSelectedMovie={setSelectedMovie}
+                        />
                     </div>
                 </div>
             </div>
