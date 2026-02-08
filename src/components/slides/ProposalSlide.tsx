@@ -70,7 +70,7 @@ export const ProposalSlide = () => {
             <ProposalScene />
 
             <div className="relative z-10 w-full h-full overflow-y-auto custom-scrollbar">
-                <div className="min-h-full flex flex-col lg:flex-row items-stretch p-4 md:p-8 gap-6">
+                <div className="min-h-full flex flex-col lg:flex-row items-stretch p-3 sm:p-4 md:p-6 lg:p-8 gap-4 sm:gap-6">
                     {/* Left Side - Proposal */}
                     <div className="flex-1 flex flex-col items-center justify-center space-y-8 pointer-events-none lg:min-h-screen">
                         {!accepted ? (
@@ -80,15 +80,15 @@ export const ProposalSlide = () => {
                                     animate={{ y: 0, opacity: 1 }}
                                     className="text-center space-y-4"
                                 >
-                                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-center leading-tight drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] text-white">
+                                    <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-center leading-tight drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] text-white px-2">
                                         Will you be my<br />
-                                        <span className="text-pink-500 text-5xl md:text-7xl lg:text-8xl filter drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">Valentine?</span>
+                                        <span className="text-pink-500 text-4xl sm:text-5xl md:text-7xl lg:text-8xl filter drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">Valentine?</span>
                                     </h1>
                                     <motion.p
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: 0.5 }}
-                                        className="text-sm md:text-base text-gray-300 italic"
+                                        className="text-xs sm:text-sm md:text-base text-gray-300 italic px-2"
                                     >
                                         (Psst... there's no "No" button. You have no choice but to say yes! 😉)
                                     </motion.p>
@@ -98,7 +98,7 @@ export const ProposalSlide = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.1, boxShadow: "0 0 25px rgba(236, 72, 153, 0.6)" }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-4 px-10 rounded-full shadow-lg text-2xl z-20 transition-all border border-pink-400/30 backdrop-blur-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 md:px-10 rounded-full shadow-lg text-lg sm:text-xl md:text-2xl z-20 transition-all border border-pink-400/30 backdrop-blur-md disabled:opacity-50 disabled:cursor-not-allowed"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleYes();
@@ -115,12 +115,12 @@ export const ProposalSlide = () => {
                                 animate={{ scale: 1, opacity: 1 }}
                                 className="text-center space-y-6"
                             >
-                                <h2 className="text-8xl animate-bounce">💖</h2>
-                                <h3 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 drop-shadow-lg">
+                                <h2 className="text-6xl sm:text-7xl md:text-8xl animate-bounce">💖</h2>
+                                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 drop-shadow-lg px-2">
                                     YAY! I knew it!
                                 </h3>
                                 {emailSent && (
-                                    <p className="text-xl text-white/80">
+                                    <p className="text-base sm:text-lg md:text-xl text-white/80 px-2">
                                         Check your email for the Zoom link! 📧
                                     </p>
                                 )}
@@ -129,7 +129,7 @@ export const ProposalSlide = () => {
                     </div>
 
                     {/* Right Side - Date Plan Preview */}
-                    <div className="flex-1 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-4 md:p-6 overflow-y-auto custom-scrollbar max-h-[600px] lg:max-h-full pointer-events-auto">
+                    <div className="flex-1 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-3 sm:p-4 md:p-6 overflow-y-auto custom-scrollbar max-h-[600px] lg:max-h-full pointer-events-auto">
                         <DatePlanContent compact />
                     </div>
                 </div>

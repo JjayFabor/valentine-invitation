@@ -1,12 +1,26 @@
-import { Canvas } from "@react-three/fiber";
-import { Text, Float, Stars, PerspectiveCamera, Sparkles } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import {
+    Text,
+    Float,
+    Stars,
+    Sparkles,
+    RoundedBox,
+} from "@react-three/drei";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 
-const HeartShape = ({ color, ...props }: any) => {
+const FONT_URL =
+    "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff";
+
+const SMALL_MOBILE_BREAKPOINT = 480;
+const MOBILE_BREAKPOINT = 768;
+
+// ——— Heart shape (extruded bezier) ———
+const HeartShape = ({ color, ...props }: { color?: string } & Record<string, unknown>) => {
     const shape = useMemo(() => {
-        const x = 0, y = 0;
+        const x = 0,
+            y = 0;
         const heartShape = new THREE.Shape();
         heartShape.moveTo(x + 0.5, y + 0.5);
         heartShape.bezierCurveTo(x + 0.5, y + 0.5, x + 0.4, y, x, y);
@@ -18,50 +32,100 @@ const HeartShape = ({ color, ...props }: any) => {
         return heartShape;
     }, []);
 
+    const meshRef = useRef<THREE.Mesh>(null);
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.008;
+            meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime) * 0.08;
+        }
+    });
+
     return (
-        <mesh {...props}>
-            <extrudeGeometry args={[shape, { depth: 0.3, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1 }]} />
-            <meshStandardMaterial color={color || "#ff0080"} roughness={0.2} metalness={0.8} emissive={color || "#ff0080"} emissiveIntensity={0.3} />
+        <mesh ref={meshRef} {...props}>
+            <extrudeGeometry
+                args={[
+                    shape,
+                    {
+                        depth: 0.2,
+                        bevelEnabled: true,
+                        bevelSegments: 2,
+                        steps: 2,
+                        bevelSize: 0.08,
+                        bevelThickness: 0.08,
+                    },
+                ]}
+            />
+            <meshStandardMaterial
+                color={color || "#ff0080"}
+                roughness={0.25}
+                metalness={0.7}
+                emissive={color || "#ff0080"}
+                emissiveIntensity={0.28}
+            />
         </mesh>
     );
 };
 
 const FloatingHearts = () => {
-    const hearts = useMemo(() => {
-        return new Array(25).fill(0).map(() => ({
-            position: [
-                (Math.random() - 0.5) * 25,
-                (Math.random() - 0.5) * 25,
-                (Math.random() - 0.5) * 15 - 5
-            ],
-            scale: Math.random() * 0.8 + 0.3,
-            rotation: [Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI],
-            color: Math.random() > 0.5 ? "#ff0080" : "#ff69b4"
-        }));
-    }, []);
+    const hearts = useMemo(
+        () =>
+            new Array(20).fill(0).map(() => ({
+                position: [
+                    (Math.random() - 0.5) * 22,
+                    (Math.random() - 0.5) * 18,
+                    (Math.random() - 0.5) * 12 - 5,
+                ] as [number, number, number],
+                scale: Math.random() * 0.5 + 0.2,
+                color: Math.random() > 0.5 ? "#ff0080" : "#ff69b4",
+            })),
+        []
+    );
 
     return (
         <>
             {hearts.map((data, i) => (
-                <Float key={i} speed={0.5 + Math.random() * 0.5} rotationIntensity={0.5} floatIntensity={1}>
-                    <HeartShape
-                        position={data.position as [number, number, number]}
-                        scale={data.scale}
-                        rotation={data.rotation as [number, number, number]}
-                        color={data.color}
-                    />
+                <Float
+                    key={i}
+                    speed={0.6 + Math.random() * 0.5}
+                    rotationIntensity={0.4}
+                    floatIntensity={0.7}
+                >
+                    <HeartShape position={data.position} scale={data.scale} color={data.color} />
                 </Float>
             ))}
         </>
     );
 };
 
-const IntroScene = () => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+// ——— Soft glowing orbs ———
+const GlowOrb = ({
+    position,
+    color,
+    scale,
+}: {
+    position: [number, number, number];
+    color: string;
+    scale: number;
+}) => {
+    const meshRef = useRef<THREE.Mesh>(null);
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.position.y += Math.sin(state.clock.elapsedTime + position[0]) * 0.002;
+            meshRef.current.rotation.y += 0.004;
+        }
+    });
 
     return (
+        <mesh ref={meshRef} position={position} scale={scale}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} transparent opacity={0.3} />
+        </mesh>
+    );
+};
+
+const IntroScene = ({ isMobile }: { isMobile: boolean }) => {
+    return (
         <>
-            <PerspectiveCamera makeDefault position={[0, 0, isMobile ? 12 : 8]} />
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={2} color="#ff1493" />
             <pointLight position={[-10, -10, -10]} intensity={1} color="#ff69b4" />
@@ -81,7 +145,7 @@ const IntroScene = () => {
                     position={[0, 0.5, 0]}
                     maxWidth={isMobile ? 5 : 7}
                     textAlign="center"
-                    font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
+                    font={FONT_URL}
                 >
                     2025 Wrapped
                     <meshStandardMaterial
@@ -101,7 +165,7 @@ const IntroScene = () => {
                     position={[0, -1.2, 0]}
                     maxWidth={isMobile ? 4 : 6}
                     textAlign="center"
-                    font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
+                    font={FONT_URL}
                 >
                     It's been quite a year...
                 </Text>
@@ -111,23 +175,41 @@ const IntroScene = () => {
 };
 
 export const IntroSlide = () => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const [isMobile, setIsMobile] = useState(false);
+    const [isSmallMobile, setIsSmallMobile] = useState(false);
+
+    useEffect(() => {
+        const check = () => {
+            const w = window.innerWidth;
+            setIsMobile(w < MOBILE_BREAKPOINT);
+            setIsSmallMobile(w < SMALL_MOBILE_BREAKPOINT);
+        };
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    const cameraZ = isSmallMobile ? 14 : isMobile ? 11 : 8;
+    const cameraFov = isSmallMobile ? 44 : 50;
 
     return (
-        <div className="w-full h-full relative overflow-hidden bg-black">
+        <div className="w-full h-full relative overflow-hidden bg-gradient-to-b from-black via-[#0a0510] to-black min-h-[320px]">
             <div className="absolute inset-0 z-0">
-                <Canvas>
-                    <IntroScene />
+                <Canvas
+                    camera={{ position: [0, 0, cameraZ], fov: cameraFov }}
+                    dpr={typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1}
+                    gl={{ antialias: true, alpha: false }}
+                >
+                    <IntroScene isMobile={isMobile} />
                 </Canvas>
             </div>
 
-            {/* Overlay UI */}
-            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end items-center pb-20">
+            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end items-center pb-8 sm:pb-10 md:pb-20">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 2, duration: 1 }}
-                    className="text-sm text-gray-400 animate-pulse"
+                    className="text-[10px] sm:text-xs md:text-sm text-gray-400 animate-pulse px-4 text-center"
                 >
                     {isMobile ? "Swipe to continue →" : "Swipe or Click right to continue →"}
                 </motion.div>

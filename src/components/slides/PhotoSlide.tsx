@@ -1,5 +1,5 @@
-import { useMemo, Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useMemo, Suspense, useState, useEffect, useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Sparkles, useVideoTexture } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -22,17 +22,26 @@ const HeartShape = ({ color, ...props }: any) => {
         return heartShape;
     }, []);
 
+    const meshRef = useRef<THREE.Mesh>(null);
+
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.01;
+            meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime) * 0.1;
+        }
+    });
+
     return (
-        <mesh {...props}>
+        <mesh ref={meshRef} {...props}>
             <extrudeGeometry args={[shape, { depth: 0.2, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1 }]} />
-            <meshStandardMaterial color={color || "#ff0080"} roughness={0.2} metalness={0.5} />
+            <meshStandardMaterial color={color || "#ff0080"} roughness={0.2} metalness={0.5} emissive={color || "#ff0080"} emissiveIntensity={0.3} />
         </mesh>
     );
 };
 
 const FloatingHearts = () => {
     const hearts = useMemo(() => {
-        return new Array(15).fill(0).map(() => ({
+        return new Array(20).fill(0).map(() => ({
             position: [
                 (Math.random() - 0.5) * 20,
                 (Math.random() - 0.5) * 20,
@@ -47,7 +56,7 @@ const FloatingHearts = () => {
     return (
         <>
             {hearts.map((data, i) => (
-                <Float key={i} speed={1 + Math.random()} rotationIntensity={1} floatIntensity={1}>
+                <Float key={i} speed={0.5 + Math.random() * 0.5} rotationIntensity={0.5} floatIntensity={1}>
                     <HeartShape
                         position={data.position as [number, number, number]}
                         scale={data.scale}
@@ -60,7 +69,7 @@ const FloatingHearts = () => {
     );
 };
 
-const VideoFrame = () => {
+const VideoFrame = ({ isMobile }: { isMobile: boolean }) => {
     const texture = useVideoTexture(VIDEO_DATA.url, {
         unsuspend: 'canplay',
         muted: true,
@@ -68,31 +77,33 @@ const VideoFrame = () => {
         start: true,
     });
 
+    const scale: [number, number, number] = isMobile ? [4, 2.8, 1] : [5, 3.5, 1];
+
     return (
-        <mesh scale={[5, 3.5, 1]}>
+        <mesh scale={scale}>
             <planeGeometry />
             <meshBasicMaterial map={texture} toneMapped={false} />
         </mesh>
     );
 }
 
-const PhotoScene = () => {
+const PhotoScene = ({ isMobile }: { isMobile: boolean }) => {
     return (
         <>
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1} color="#ffcccc" />
-            <Sparkles count={100} scale={12} size={2} speed={0.4} opacity={0.5} color="#fff" />
+            <Sparkles count={isMobile ? 50 : 100} scale={12} size={2} speed={0.4} opacity={0.5} color="#fff" />
 
             <FloatingHearts />
 
             <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
                 <group position={[0, 0, 0]}>
-                    <Suspense fallback={<mesh scale={[5, 3.5, 0.1]}><planeGeometry /><meshStandardMaterial color="#333" /></mesh>}>
-                        <VideoFrame />
+                    <Suspense fallback={<mesh scale={[isMobile ? 4 : 5, isMobile ? 2.8 : 3.5, 0.1]}><planeGeometry /><meshStandardMaterial color="#333" /></mesh>}>
+                        <VideoFrame isMobile={isMobile} />
                     </Suspense>
                     {/* Frame border */}
                     <mesh position={[0, 0, -0.1]}>
-                        <boxGeometry args={[5.2, 3.7, 0.1]} />
+                        <boxGeometry args={[isMobile ? 4.2 : 5.2, isMobile ? 3 : 3.7, 0.1]} />
                         <meshStandardMaterial color="#ffc0cb" metalness={0.8} roughness={0.2} />
                     </mesh>
                 </group>
@@ -102,16 +113,27 @@ const PhotoScene = () => {
 };
 
 export const PhotoSlide = () => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     return (
-        <div className="w-full h-full relative overflow-hidden bg-black/90">
-            <Canvas camera={{ position: [0, 0, 8], fov: 50 }}>
-                <PhotoScene />
+        <div className="w-full h-full relative overflow-hidden bg-black">
+            <Canvas camera={{ position: [0, 0, isMobile ? 10 : 8], fov: 50 }}>
+                <PhotoScene isMobile={isMobile} />
             </Canvas>
 
             {/* Overlay UI */}
-            <div className="absolute inset-0 flex flex-col justify-between p-6 pointer-events-none z-10">
-                <div className="mt-10 text-center">
-                    <h2 className="text-3xl font-bold text-pink-400 drop-shadow-lg font-serif">Memory Lane</h2>
+            <div className="absolute inset-0 flex flex-col justify-between p-4 md:p-6 pointer-events-none z-10">
+                <div className="mt-4 sm:mt-6 md:mt-10 text-center px-2">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-pink-400 drop-shadow-lg font-serif">Memory Lane</h2>
                 </div>
 
                 <div className="mb-20 text-center">
