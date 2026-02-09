@@ -73,7 +73,7 @@ const FloatingHearts = () => {
 
 const VideoFrame = ({ isMobile }: { isMobile: boolean }) => {
     const texture = useVideoTexture(VIDEO_DATA.url, {
-        unsuspend: 'canplay',
+        unsuspend: 'loadedmetadata', // Unsuspend faster to avoid blocking the UI
         muted: true,
         loop: true,
         start: true,
@@ -85,16 +85,28 @@ const VideoFrame = ({ isMobile }: { isMobile: boolean }) => {
         if (texture.image instanceof HTMLVideoElement) {
             const video = texture.image;
 
+            // Standard attributes
+            video.muted = true;
+            video.autoplay = true;
+            video.loop = true;
+
+            // Critical for iOS Safari
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('webkit-playsinline', 'true');
+            video.setAttribute('preload', 'auto');
+
             const forcePlay = () => {
+                // Some browsers require load() after interaction to authorized the stream
+                video.load();
                 video.play().catch(() => {
-                    // Failing silently as some browsers block initial attempts
+                    // Failing silently
                 });
             };
 
             // Attempt play immediately
-            forcePlay();
+            video.play().catch(() => { });
 
-            // Add interaction listeners for Safari/Mobile restrictions
+            // Use the first interaction to "unlock" the video
             window.addEventListener('click', forcePlay, { once: true });
             window.addEventListener('touchstart', forcePlay, { once: true });
 
