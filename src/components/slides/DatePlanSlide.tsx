@@ -197,7 +197,7 @@ const MovieDetailModal = ({ movie, onClose, setSelectedMovie }: { movie: typeof 
     );
 };
 
-const steps = [
+export const steps = [
     {
         id: "movie",
         timePHT: "2:00 PM",

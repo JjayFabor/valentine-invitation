@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { toast, Toaster } from "sonner";
 import { ProposalScene } from "../scene/ProposalScene";
-import { DatePlanContent } from "./DatePlanSlide";
+import { DatePlanContent, steps } from "./DatePlanSlide";
 import { sendValentineEmail, getEmailConfig } from "../../utils/emailService";
 
 export const ProposalSlide = ({ selectedMovie, setSelectedMovie }: { selectedMovie: any, setSelectedMovie: (movie: any) => void }) => {
@@ -38,13 +38,22 @@ export const ProposalSlide = ({ selectedMovie, setSelectedMovie }: { selectedMov
         setSending(true);
         const config = getEmailConfig();
 
+        // Format schedule for email
+        const formattedSchedule = steps.map(step => {
+            let description = step.description;
+            if (step.id === 'movie' && selectedMovie) {
+                description = `Teleparty session: "${selectedMovie.title}" ${selectedMovie.emoji}`;
+            }
+            return `${step.timePHT} — ${step.title}\n${description}`;
+        }).join('\n\n');
+
         const success = await sendValentineEmail({
             yourEmail: config.yourEmail,
             girlfriendEmail: config.girlfriendEmail,
+            girlfriendName: config.girlfriendName,
             zoomLink: config.zoomLink,
             suggestions: suggestions || "No suggestions - the plan looks perfect!",
-            movieTitle: selectedMovie?.title,
-            movieEmoji: selectedMovie?.emoji,
+            schedule: formattedSchedule,
         });
 
         setSending(false);

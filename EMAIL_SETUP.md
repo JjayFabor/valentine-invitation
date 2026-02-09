@@ -28,32 +28,17 @@ To enable email notifications when your girlfriend accepts the proposal, follow 
 ```
 Hi {{recipient_name}}! 💖
 
-Exciting news - our Valentine's Day virtual date is all set! 
+Exciting news—our Valentine's Day virtual date is officially set! I can't wait to see you.
 
-═══════════════════════════════════════
+The Details
 
-📅 DATE: Friday, February 14th, 2026
+    When: Friday, Feb 14th, 2026
 
-🔗 ZOOM LINK: {{zoom_link}}
+    Where: {{zoom_link}}
 
-═══════════════════════════════════════
+✨ Our Schedule ✨
 
-✨ OUR DATE SCHEDULE ✨
-
-🍕 7:00 PM - Dinner Date
-   We'll order our favorite pizzas and eat "together" 
-   on video call!
-
-🍿 8:30 PM - Movie Night  
-   Teleparty session watching "About Time"
-   (or whatever you'd prefer!)
-
-🎮 10:30 PM - Co-op Gaming
-   It Takes Two / Overcooked / Stardew Valley
-   Let's see if we survive without chaos! 😄
-
-🎁 11:30 PM - Gift Exchange
-   Time to open the digital surprise!
+{{schedule}}
 
 ═══════════════════════════════════════
 
@@ -62,18 +47,15 @@ Exciting news - our Valentine's Day virtual date is all set!
 
 ═══════════════════════════════════════
 
-Can't wait to spend this special day with you! 
 See you on the 14th! 💕
 
-With love,
-Jaylord
-
-P.S. Make sure to test your Zoom link before our date! 
+Love, Jaylord
 ```
 
 5. **Important**: In the template settings, make sure these variable names are exactly as shown:
    - `{{recipient_name}}`
    - `{{zoom_link}}`
+   - `{{schedule}}`
    - `{{suggestions}}`
 
 4. Save the template and copy the **Template ID**
