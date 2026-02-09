@@ -81,6 +81,30 @@ const VideoFrame = ({ isMobile }: { isMobile: boolean }) => {
         crossOrigin: "anonymous",
     });
 
+    useEffect(() => {
+        if (texture.image instanceof HTMLVideoElement) {
+            const video = texture.image;
+
+            const forcePlay = () => {
+                video.play().catch(() => {
+                    // Failing silently as some browsers block initial attempts
+                });
+            };
+
+            // Attempt play immediately
+            forcePlay();
+
+            // Add interaction listeners for Safari/Mobile restrictions
+            window.addEventListener('click', forcePlay, { once: true });
+            window.addEventListener('touchstart', forcePlay, { once: true });
+
+            return () => {
+                window.removeEventListener('click', forcePlay);
+                window.removeEventListener('touchstart', forcePlay);
+            };
+        }
+    }, [texture]);
+
     const scale: [number, number, number] = isMobile ? [4, 2.8, 1] : [5, 3.5, 1];
 
     return (
