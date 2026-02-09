@@ -77,6 +77,8 @@ const VideoFrame = ({ isMobile }: { isMobile: boolean }) => {
         muted: true,
         loop: true,
         start: true,
+        playsInline: true,
+        crossOrigin: "anonymous",
     });
 
     const scale: [number, number, number] = isMobile ? [4, 2.8, 1] : [5, 3.5, 1];
