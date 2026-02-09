@@ -57,6 +57,10 @@ Love, Jaylord
    - `{{zoom_link}}`
    - `{{schedule}}`
    - `{{suggestions}}`
+   - `{{cc_email}}`
+
+> [!TIP]
+> To receive a copy of the email yourself, go to the **Settings** tab of your template in EmailJS and add `{{cc_email}}` to the **CC** field.
 
 4. Save the template and copy the **Template ID**
 

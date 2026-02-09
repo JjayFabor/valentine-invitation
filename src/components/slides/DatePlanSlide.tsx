@@ -202,7 +202,7 @@ export const steps = [
         id: "movie",
         timePHT: "2:00 PM",
         timeUAE: "5:00 PM",
-        title: "Movie Night 🍿",
+        title: "Movie Time 🍿",
         description: "Teleparty session! Pick our movie below (or you can suggest one). Don't forget the popcorn."
     },
     {

@@ -13,6 +13,19 @@ export const ProposalSlide = ({ selectedMovie, setSelectedMovie }: { selectedMov
     const [emailSent, setEmailSent] = useState(false);
 
     const handleYes = async () => {
+        if (!selectedMovie) {
+            toast.error("Please pick a movie for our date first! 🍿", {
+                duration: 4000,
+                style: {
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    color: 'white',
+                    border: '1px solid rgba(255, 105, 180, 0.3)'
+                }
+            });
+            return;
+        }
+
         setAccepted(true);
 
         // Fire confetti
