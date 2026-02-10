@@ -50,7 +50,7 @@ export const sendValentineEmail = async (data: EmailData): Promise<boolean> => {
 
 export const getEmailConfig = () => ({
     yourEmail: import.meta.env.VITE_YOUR_EMAIL || 'faborjaylordvhan@gmail.com',
-    girlfriendEmail: import.meta.env.VITE_GIRLFRIEND_EMAIL || 'jaylordf@callboxinc.com',
+    girlfriendEmail: import.meta.env.VITE_GIRLFRIEND_EMAIL || 'pamelamoronio2000@gmail.com',
     girlfriendName: import.meta.env.VITE_GIRLFRIEND_NAME || 'Ms. Pamela Moronio',
     zoomLink: import.meta.env.VITE_ZOOM_LINK || 'https://zoom.us/j/your-meeting-id',
 });
